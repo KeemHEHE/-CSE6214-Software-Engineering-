@@ -7,7 +7,7 @@
 
 | Student name | Student ID | Assigned actor, use cases, diagrams and responsibilities |
 |---|---|---|
-| \<name\> | \<student #\> | |
+| Mohammad Adam Hakeem bin Mohd Adha Taufek | 252UC242PM | |
 | \<name\> | \<student #\> | |
 | \<name\> | \<student #\> | |
 | \<name\> | \<student #\> | |
