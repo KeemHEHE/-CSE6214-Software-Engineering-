@@ -3,7 +3,7 @@
 
 - **Tutorial Group:** TT6L / G[xx]
 - **Submission week:** Week 7
-- **Version:** 0.4 (draft) / 18/11/2026
+- **Version:** 0.5 (draft) / 18/11/2026
 
 | Student name | Student ID | Assigned actor, use cases, diagrams and responsibilities |
 |---|---|---|
@@ -47,6 +47,7 @@
 | 0.2 | 18/11/2026 | Adam | ERD fixes: optional worker on task, point may have no bins, SCHEDULE_DAY table for 1NF, STATUS_LOG real FKs, task waste type, lockout and token columns, enum values filled in. |
 | 0.3 | 18/11/2026 | Adam | Rebalanced work: M5 split (notifications to Adam, dashboard/export to Member 2); report sections assigned per member. |
 | 0.4 | 18/11/2026 | Adam | Checked against the official template and project description. Added route optimisation (OPT-04) so all four Level 5 features from the brief are covered, one per member. Use case headings numbered 3.2.x as in the template. |
+| 0.5 | 18/11/2026 | Adam | Made the whole report consistent with the work split: Level 5 features added to task breakdown, Gantt chart, system overview, ERD (REWARD_TRANSACTION), architecture, navigation flow, screen list and traceability. |
 
 ---
 
@@ -121,6 +122,7 @@ Reasons for this choice:
 | 2.1 | Project setup, M1 authentication and role guard | Adam | 8 |
 | 2.1a | Database schema script (from ERD) and seed data | Member 2 | 8 |
 | 2.2 | Module implementation: M2 + M5 reporting (Member 2), M3 (Member 3), M4 (Member 4), M5 notifications (Adam) | Module owners | 8–11 |
+| 2.2a | Level 5 features: OPT-01 rewards (Member 3), OPT-02 map and status tracking (Adam), OPT-03 trend analysis (Member 2), OPT-04 route optimisation (Member 4) | Feature owners | 10–11 |
 | 2.3 | Integration and testing | All | 11–12 |
 | 2.4 | Individual reports and oral defence prep | Each member | 12–13 |
 
@@ -159,6 +161,7 @@ gantt
     section Part II
     Setup and M1 authentication  :        q1, 2026-12-28, 7d
     M2 to M5 implementation      :        q2, 2027-01-04, 21d
+    Level 5 features             :        q5, 2027-01-11, 14d
     Integration and testing      :        q3, 2027-01-18, 14d
     MS6 Part II submitted        :milestone, m6, 2027-01-31, 0d
     Oral defence                 :        q4, 2027-02-01, 5d
@@ -187,6 +190,8 @@ EcoBin MMU supports five main business processes.
 3. **Waste reporting (M3).** A student or staff member reports a problem such as a full bin, overflow, a damaged bin, contamination or illegal dumping, with an optional photo. The officer reviews the report, sets its priority, and either turns it into a collection task, resolves it directly, or closes it as a duplicate. The reporter can follow the report's status.
 4. **Collection scheduling and assignment (M4).** The officer sets recurring schedules (for example paper bins at the library every Monday and Thursday). The system generates collection tasks from schedules each day, and the officer assigns these, along with tasks from urgent reports, to collection workers. Workers see their task list, mark tasks as in progress or completed, and record the weight collected per bin.
 5. **Performance reporting and notifications (M5).** The system turns collection records and reports into dashboards showing weight collected by waste type, point and period, open and overdue tasks, and average report response time. Users get in-app and email notifications when a report changes status or a task is assigned.
+
+On top of these core processes, the system adds the four Level 5 features from the project brief: reward points and a leaderboard for students whose reports are resolved (OPT-01), a campus map showing each point's bin and collection status (OPT-02), trend analysis of waste collected (OPT-03), and a suggested visiting order for each worker's daily tasks (OPT-04).
 
 ### 2.2 Actors
 
@@ -252,8 +257,8 @@ Priority uses MoSCoW: **M** = Must, **S** = Should, **C** = Could.
 | FR-29 | The system shall send an in-app notification, and an email where enabled, when a user's report changes status or a task is assigned to a worker. | M | M5 |
 | FR-30 | Users shall be able to view notifications and mark them as read. | M | M5 |
 | FR-31 | The system shall notify officers when a High priority report has had no action for 4 working hours. | S | M5 |
-| OPT-01 | The system could award reward points to reporters for reports that are resolved (not rejected or duplicate) and show a leaderboard. | C | M3/M5 |
-| OPT-02 | The system could show recycling points on an interactive campus map with colour-coded bin status, and let users follow each point's collection status for the day (Scheduled, In Progress, Collected). | C | M2/M4 |
+| OPT-01 | The system could award reward points to reporters for reports that are resolved (not rejected or duplicate) and show a leaderboard. | C | M3 |
+| OPT-02 | The system could show recycling points on an interactive campus map with colour-coded bin status, and let users follow each point's collection status for the day (Scheduled, In Progress, Collected). | C | Map (reads M2, M4) |
 | OPT-03 | The system could show weekly and monthly trend charts of waste collected by type, and flag points whose weekly weight rises more than 30% over their 4-week average. | C | M5 |
 | OPT-04 | The system could suggest a visiting order for a worker's tasks for the day, using the recycling points' coordinates and a nearest-neighbour ordering starting from the facilities office. | C | M4 |
 
@@ -426,6 +431,8 @@ erDiagram
     WASTE_REPORT |o--o| COLLECTION_TASK : "creates"
     WASTE_REPORT |o--o{ WASTE_REPORT : "duplicate of"
     COLLECTION_TASK ||--o{ COLLECTION_RECORD : "produces"
+    USER ||--o{ REWARD_TRANSACTION : "earns"
+    WASTE_REPORT |o--o| REWARD_TRANSACTION : "awards"
 
     USER {
         int user_id PK
@@ -519,6 +526,14 @@ erDiagram
         boolean is_read
         datetime created_at
     }
+    REWARD_TRANSACTION {
+        int txn_id PK
+        int user_id FK
+        int report_id FK "nullable, unique"
+        int points
+        varchar reason
+        datetime created_at
+    }
     STATUS_LOG {
         int log_id PK
         int report_id FK "nullable"
@@ -545,6 +560,7 @@ erDiagram
 | COLLECTION_TASK | A single job for one point on one date. It comes either from a schedule (`schedule_id`) or from a report (`report_id`), and at least one of these must be set. A report creates at most one task (1:0..1). `worker_id` is empty until assigned, so a task has zero or one worker. `waste_type` limits which bins at the point the task covers; if empty, the task covers every active bin at the point. |
 | COLLECTION_RECORD | The weight collected from one bin during one task. This is the main source for the performance reports in M5. One task produces many records, at most one per bin (`task_id` + `bin_id` unique). |
 | NOTIFICATION | A message to one user about a status change or assignment, shown in-app and optionally emailed. |
+| REWARD_TRANSACTION | Points given to a user (OPT-01). One row per award, normally for a report that ends Resolved (at most one award per report). A user's total and the leaderboard are worked out by summing this table, so there is no separate points column to keep in sync. |
 | STATUS_LOG | Audit trail of every status change on reports and tasks, with who made it and when (NFR-09). Used to compute average resolution time (FR-27). It has two nullable foreign keys, `report_id` and `task_id`, with exactly one set, so the database can enforce that every log row points to a real record. |
 
 **Data assumptions and constraints**
@@ -565,9 +581,9 @@ EcoBin MMU uses a three-tier architecture: a React single-page application, a No
 flowchart TB
     subgraph P["Presentation tier (browser)"]
         direction LR
-        UI1["Student/Staff pages<br/>Report form, My Reports, Points list"]
-        UI2["Worker pages<br/>Today's Tasks, Task detail"]
-        UI3["Officer/Admin pages<br/>Dashboard, Reports queue, Bins, Schedules, Users"]
+        UI1["Student/Staff pages<br/>Report form, My Reports, Points list, Campus Map, Leaderboard"]
+        UI2["Worker pages<br/>Today's Tasks with suggested order, Task detail"]
+        UI3["Officer/Admin pages<br/>Dashboard with trends, Reports queue, Bins, Schedules, Users, Campus Map"]
     end
 
     subgraph A["Application tier (Node.js + Express REST API)"]
@@ -616,6 +632,10 @@ flowchart TB
 | M4 Collection Scheduling and Assignment | Member 4 | Schedules, task generation, assignment, collection records; "resolve report" call to M3 | M1, M2 (bin list, fill status), M3, M5 notifications |
 | M5 Reporting (dashboard and export) | Member 2 | Dashboard queries, PDF/CSV export | Reads data from M2 to M4 |
 | M5 Notifications | Adam | Notification creation, in-app list, email sending, 4-hour escalation job | Events from M3 and M4; email service |
+| Level 5: OPT-01 Rewards | Member 3 | Award points when a report is resolved, leaderboard | M3 events |
+| Level 5: OPT-02 Campus Map and Status Tracking | Adam | Map page with points, bin fill status and today's collection status | Reads M2 (points, bins) and M4 (tasks) |
+| Level 5: OPT-03 Trend Analysis | Member 2 | Weekly/monthly trend charts, spike flags | Reads collection records (M4) |
+| Level 5: OPT-04 Route Optimisation | Member 4 | Suggested visiting order for a worker's daily tasks | Point coordinates (M2), tasks (M4) |
 
 **Design rationale**
 - **Three tiers** keep the UI separate from business rules and data, so each member can work on their module's API and pages without touching other modules' code.
@@ -642,6 +662,9 @@ flowchart LR
     S1 --> S2[Report a Problem]
     S1 --> S3[Report Detail]
     S1 --> S4[Recycling Points]
+    S1 --> S5[Leaderboard]
+    S4 --> MAP[Campus Map]
+    O1 --> MAP
     QR[Scan bin QR code] --> S2
 
     W1 --> W2[Task Detail and Record Collection]
@@ -752,6 +775,10 @@ flowchart LR
 | Schedules, Task Assignment, Today's Tasks, Task Detail | UC-09 to UC-12 | Member 4 |
 | Dashboard, Export | UC-14, UC-15 | Member 2 |
 | Notifications | UC-16 | Adam |
+| Campus Map (OPT-02) | Recycling Points list, UC-11 | Adam |
+| Trend charts on Dashboard (OPT-03) | UC-14 | Member 2 |
+| Leaderboard, points on My Reports (OPT-01) | UC-08 | Member 3 |
+| Suggested order on Today's Tasks (OPT-04) | UC-11 | Member 4 |
 
 > Note for the final PDF: these text wireframes are placeholders. Redraw them in Figma or draw.io and keep the annotations.
 
@@ -778,8 +805,8 @@ flowchart LR
 | FR-26, FR-27 | UC-14 | COLLECTION_RECORD, WASTE_REPORT, COLLECTION_TASK, STATUS_LOG | M5 / Dashboard |
 | FR-28 | UC-15 | COLLECTION_RECORD | M5 / Export |
 | FR-29, FR-30, FR-31 | UC-16, Send Notification | NOTIFICATION | M5 / Notifications, scheduler job |
-| OPT-01 | UC-08, UC-13 | USER (points), REWARD_TRANSACTION (to add) | M3 / My Reports, leaderboard |
-| OPT-02 | UC-11, UC-12, Recycling Points list | RECYCLING_POINT, BIN, COLLECTION_TASK | M2 + M4 / Campus Map |
+| OPT-01 | UC-08, UC-13 | REWARD_TRANSACTION, USER, WASTE_REPORT | M3 / My Reports, Leaderboard |
+| OPT-02 | UC-11, UC-12, Recycling Points list | RECYCLING_POINT, BIN, COLLECTION_TASK | Map (reads M2, M4) / Campus Map |
 | OPT-03 | UC-14 | COLLECTION_RECORD | M5 / Dashboard trend chart |
 | OPT-04 | UC-11 | COLLECTION_TASK, RECYCLING_POINT | M4 / Today's Tasks (suggested order) |
 | NFR-01 to NFR-04 | UC-01, UC-07 | USER, WASTE_REPORT | M1 middleware, data access layer |
@@ -792,7 +819,7 @@ flowchart LR
 
 **Open issues**
 1. Confirm with the tutor whether the Administrator should also be able to do all officer tasks or only manage accounts.
-2. Reward points (OPT-01) need an extra REWARD_TRANSACTION table; Member 3 to add it to the ERD if the group confirms OPT-01.
+2. Confirm with the tutor how many points each resolved report should earn (OPT-01). The draft assumes a fixed amount per report.
 3. Agree on how to host the prototype for the demo (local machine or a free cloud host).
 
 **Implementation priorities for Part II**
