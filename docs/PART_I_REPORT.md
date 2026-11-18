@@ -3,16 +3,16 @@
 
 - **Tutorial Group:** TT6L / G[xx]
 - **Submission week:** Week 7
-- **Version:** 0.2 (draft) / 18/11/2026
+- **Version:** 0.3 (draft) / 18/11/2026
 
 | Student name | Student ID | Assigned actor, use cases, diagrams and responsibilities |
 |---|---|---|
-| Mohammad Adam Hakeem bin Mohd Adha Taufek | 252UC242PM | Project lead. Actor: Administrator. M1 User Management (UC-01 to UC-04) and M5 Recycling Performance Reporting and Notifications (UC-14 to UC-16). System architecture diagram, traceability table, report integration. |
-| \<Member 2\> | \<student #\> | Actor: Sustainability Officer. M2 Recycling Point and Bin Management (UC-05, UC-06). ERD and data dictionary. |
-| \<Member 3\> | \<student #\> | Actor: Student/Staff. M3 Waste Reporting and Collection Management (UC-07, UC-08, UC-13). Use case diagram. |
-| \<Member 4\> | \<student #\> | Actor: Collection Worker. M4 Collection Scheduling and Assignment (UC-09 to UC-12). Wireframes and navigation flow. |
+| Mohammad Adam Hakeem bin Mohd Adha Taufek | 252UC242PM | Project lead. Actor: Administrator. M1 User Management (UC-01 to UC-04) and the notification service in M5 (UC-16, FR-29 to FR-31). Sections 1.1 to 1.5, 5 (architecture) and 7 (traceability). Project setup, final PDF compile. |
+| \<Member 2\> | \<student #\> | Actor: Sustainability Officer. M2 Recycling Point and Bin Management (UC-05, UC-06) and the performance reporting part of M5 (UC-14, UC-15, FR-26 to FR-28). Section 4 (ERD and data dictionary). |
+| \<Member 3\> | \<student #\> | Actor: Student/Staff. M3 Waste Reporting and Collection Management (UC-07, UC-08, UC-13). Section 2 (system overview), 3.2 use case diagram, 8 (references). Requirements survey. |
+| \<Member 4\> | \<student #\> | Actor: Collection Worker. M4 Collection Scheduling and Assignment (UC-09 to UC-12). Section 1.6 (Gantt chart, risks) and 6 (wireframes and navigation flow). |
 
-> Draft note: group members, group number and IDs are placeholders until the group is formed (deadline 20/11/2026). Module ownership above is a proposal and can be swapped once the group agrees.
+> Draft note: group members, group number and IDs are placeholders until the group is formed (deadline 20/11/2026). Each member also writes the FRs, NFRs and use case descriptions for their own modules (Section 3) and their own weekly AI tracker entry (Section 9). M5 is split in two: Adam owns notifications and Member 2 owns the dashboard and export, so that everyone has a similar amount of code to defend in Part II.
 
 ## Contents
 - [Revision History](#revision-history)
@@ -44,6 +44,7 @@
 | Version | Date | Author(s) | Description of Version |
 |---|---|---|---|
 | 0.1 | 18/11/2026 | Adam | First full draft of all sections for group review. Members 2 to 4 still placeholders. |
+| 0.3 | 18/11/2026 | Adam | Rebalanced work: M5 split (notifications to Adam, dashboard/export to Member 2); report sections assigned per member. |
 | 0.2 | 18/11/2026 | Adam | ERD fixes: optional worker on task, point may have no bins, SCHEDULE_DAY table for 1NF, STATUS_LOG real FKs, task waste type, lockout and token columns, enum values filled in. |
 
 ---
@@ -104,17 +105,20 @@ Reasons for this choice:
 | WBS | Task | Owner | Week |
 |---|---|---|---|
 | 1.1 | Form group, agree on roles and tools (GitHub, Discord) | All | 1–2 |
-| 1.2 | Background, problem statement, scope | Adam | 2 |
+| 1.2 | Background, problem statement, scope, development process | Adam | 2 |
 | 1.3 | Requirements elicitation (short survey of 10+ students, interview with facilities if possible) | Member 3 | 2–3 |
-| 1.4 | FR/NFR list and prioritisation | All (each for own module) | 3 |
-| 1.5 | Use case diagram and use case descriptions | Member 3 (diagram), all (own UCs) | 3–4 |
+| 1.4 | FR/NFR list and prioritisation | Each member for own modules; Adam merges | 3 |
+| 1.5 | Use case diagram and use case descriptions | Member 3 (diagram, Section 2), each member (own UCs) | 3–4 |
 | 1.6 | ERD and data dictionary | Member 2 | 4–5 |
 | 1.7 | System architecture | Adam | 5 |
 | 1.8 | Wireframes and navigation flow | Member 4 | 5–6 |
-| 1.9 | Traceability table, consistency check, references | Adam | 6 |
+| 1.9 | Traceability table and consistency check | Adam | 6 |
+| 1.9a | Gantt chart and risk register (kept updated weekly) | Member 4 | 2–7 |
+| 1.9b | References and citation check | Member 3 | 6 |
 | 1.10 | Final review, PDF export, submission | All | 7 |
-| 2.1 | Project setup, DB schema, M1 authentication | Adam | 8 |
-| 2.2 | Module implementation M2 to M5 | Module owners | 8–11 |
+| 2.1 | Project setup, M1 authentication and role guard | Adam | 8 |
+| 2.1a | Database schema script (from ERD) and seed data | Member 2 | 8 |
+| 2.2 | Module implementation: M2 + M5 reporting (Member 2), M3 (Member 3), M4 (Member 4), M5 notifications (Adam) | Module owners | 8–11 |
 | 2.3 | Integration and testing | All | 11–12 |
 | 2.4 | Individual reports and oral defence prep | Each member | 12–13 |
 
@@ -605,9 +609,10 @@ flowchart TB
 |---|---|---|---|
 | M1 User Management | Adam | Login, token issue and check, role guard used by all other modules | Email service |
 | M2 Recycling Point and Bin Management | Member 2 | Point and bin data, QR codes, bin status updates | M1 (auth) |
-| M3 Waste Reporting | Member 3 | Report create/review/close; "create task from report" call to M4 | M1, M2 (point/bin lookup), M4, M5 |
-| M4 Collection Scheduling and Assignment | Member 4 | Schedules, task generation, assignment, collection records; "resolve report" call to M3 | M1, M2 (bin list, fill status), M3, M5 |
-| M5 Reporting and Notifications | Adam | Dashboard queries, PDF/CSV export, notification creation and email sending | Reads data from M2 to M4; email service |
+| M3 Waste Reporting | Member 3 | Report create/review/close; "create task from report" call to M4 | M1, M2 (point/bin lookup), M4, M5 notifications |
+| M4 Collection Scheduling and Assignment | Member 4 | Schedules, task generation, assignment, collection records; "resolve report" call to M3 | M1, M2 (bin list, fill status), M3, M5 notifications |
+| M5 Reporting (dashboard and export) | Member 2 | Dashboard queries, PDF/CSV export | Reads data from M2 to M4 |
+| M5 Notifications | Adam | Notification creation, in-app list, email sending, 4-hour escalation job | Events from M3 and M4; email service |
 
 **Design rationale**
 - **Three tiers** keep the UI separate from business rules and data, so each member can work on their module's API and pages without touching other modules' code.
@@ -742,7 +747,8 @@ flowchart LR
 | Points and Bins, Recycling Points list | UC-05, UC-06 | Member 2 |
 | Report a Problem, My Reports, Report Detail, Reports Queue, Report Review | UC-07, UC-08, UC-13 | Member 3 |
 | Schedules, Task Assignment, Today's Tasks, Task Detail | UC-09 to UC-12 | Member 4 |
-| Dashboard, Export, Notifications | UC-14 to UC-16 | Adam |
+| Dashboard, Export | UC-14, UC-15 | Member 2 |
+| Notifications | UC-16 | Adam |
 
 > Note for the final PDF: these text wireframes are placeholders. Redraw them in Figma or draw.io and keep the annotations.
 
