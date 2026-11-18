@@ -3,14 +3,14 @@
 
 - **Tutorial Group:** TT6L / G[xx]
 - **Submission week:** Week 7
-- **Version:** 0.3 (draft) / 18/11/2026
+- **Version:** 0.4 (draft) / 18/11/2026
 
 | Student name | Student ID | Assigned actor, use cases, diagrams and responsibilities |
 |---|---|---|
-| Mohammad Adam Hakeem bin Mohd Adha Taufek | 252UC242PM | Project lead. Actor: Administrator. M1 User Management (UC-01 to UC-04) and the notification service in M5 (UC-16, FR-29 to FR-31). Sections 1.1 to 1.5, 5 (architecture) and 7 (traceability). Project setup, final PDF compile. |
-| \<Member 2\> | \<student #\> | Actor: Sustainability Officer. M2 Recycling Point and Bin Management (UC-05, UC-06) and the performance reporting part of M5 (UC-14, UC-15, FR-26 to FR-28). Section 4 (ERD and data dictionary). |
-| \<Member 3\> | \<student #\> | Actor: Student/Staff. M3 Waste Reporting and Collection Management (UC-07, UC-08, UC-13). Section 2 (system overview), 3.2 use case diagram, 8 (references). Requirements survey. |
-| \<Member 4\> | \<student #\> | Actor: Collection Worker. M4 Collection Scheduling and Assignment (UC-09 to UC-12). Section 1.6 (Gantt chart, risks) and 6 (wireframes and navigation flow). |
+| Mohammad Adam Hakeem bin Mohd Adha Taufek | 252UC242PM | Project lead. Actor: Administrator. M1 User Management (UC-01 to UC-04), the notification service in M5 (UC-16, FR-29 to FR-31) and Level 5 map/status tracking (OPT-02). Sections 1.1 to 1.5, 5 (architecture) and 7 (traceability). Project setup, final PDF compile. |
+| \<Member 2\> | \<student #\> | Actor: Sustainability Officer. M2 Recycling Point and Bin Management (UC-05, UC-06) and the performance reporting part of M5 (UC-14, UC-15, FR-26 to FR-28), plus Level 5 trend analysis (OPT-03). Section 4 (ERD and data dictionary). |
+| \<Member 3\> | \<student #\> | Actor: Student/Staff. M3 Waste Reporting and Collection Management (UC-07, UC-08, UC-13), plus Level 5 rewards (OPT-01). Section 2 (system overview), 3.2 use case diagram, 8 (references). Requirements survey. |
+| \<Member 4\> | \<student #\> | Actor: Collection Worker. M4 Collection Scheduling and Assignment (UC-09 to UC-12), plus Level 5 route optimisation (OPT-04). Section 1.6 (Gantt chart, risks) and 6 (wireframes and navigation flow). |
 
 > Draft note: group members, group number and IDs are placeholders until the group is formed (deadline 20/11/2026). Each member also writes the FRs, NFRs and use case descriptions for their own modules (Section 3) and their own weekly AI tracker entry (Section 9). M5 is split in two: Adam owns notifications and Member 2 owns the dashboard and export, so that everyone has a similar amount of code to defend in Part II.
 
@@ -46,6 +46,7 @@
 | 0.1 | 18/11/2026 | Adam | First full draft of all sections for group review. Members 2 to 4 still placeholders. |
 | 0.2 | 18/11/2026 | Adam | ERD fixes: optional worker on task, point may have no bins, SCHEDULE_DAY table for 1NF, STATUS_LOG real FKs, task waste type, lockout and token columns, enum values filled in. |
 | 0.3 | 18/11/2026 | Adam | Rebalanced work: M5 split (notifications to Adam, dashboard/export to Member 2); report sections assigned per member. |
+| 0.4 | 18/11/2026 | Adam | Checked against the official template and project description. Added route optimisation (OPT-04) so all four Level 5 features from the brief are covered, one per member. Use case headings numbered 3.2.x as in the template. |
 
 ---
 
@@ -77,14 +78,15 @@ Waste collection on campus is run on a fixed routine with no feedback from the p
 | M4 Collection Scheduling and Assignment | Create recurring collection schedules per point and waste type; generate daily collection tasks; assign tasks to workers; workers update task status and record collected weight |
 | M5 Recycling Performance Reporting and Notifications | Dashboard and reports on collected weight by waste type, point and period; report response times; in-app and email notifications for status changes and assignments |
 
-**Optional extensions (Level 5, only if time allows after core is complete)**
-- Recycling reward points for verified reports (OPT-01)
-- Interactive campus map of recycling points with bin status (OPT-02)
-- Waste generation trend chart by week and month (OPT-03)
+**Level 5 extensions (the four listed in the project brief; one per member, started after that member's core FRs pass testing)**
+- Recycling rewards and points-based recognition for resolved reports (OPT-01, Member 3)
+- Interactive recycling location map and collection status tracking (OPT-02, Adam)
+- Waste generation trend analysis by week and month (OPT-03, Member 2)
+- Collection route optimisation: suggested visiting order for a worker's tasks based on bin locations (OPT-04, Member 4)
 
 **Excluded**
 - Real IoT fill-level sensors. Fill status is updated manually by workers and through reports.
-- Automatic route optimisation for collection trucks.
+- Turn-by-turn navigation or live GPS tracking of workers. Route optimisation (OPT-04) only orders the stops.
 - Native mobile apps. The web app will be responsive instead.
 - Payment, contractor billing or payroll.
 - Integration with MMU's real student information system or CAMSYS login. Registration uses MMU email addresses only.
@@ -170,7 +172,7 @@ gantt
 | R2 | Clashing deadlines from other courses near Weeks 6–7 | High | Medium | Aim to finish design by Week 6 (MS3) so Week 7 is review only |
 | R3 | Requirements change after tutor feedback | Medium | Medium | Get the requirements baseline reviewed at MS2; log every change in the Revision History |
 | R4 | Merge conflicts or lost work | Medium | Medium | One GitHub repo, feature branches per module, pull requests reviewed by one other member |
-| R5 | Scope creep from Level 5 features | Medium | High | Optional features (OPT-01 to OPT-03) start only after all core FRs pass testing |
+| R5 | Scope creep from Level 5 features | Medium | High | Level 5 features (OPT-01 to OPT-04) start only after all core FRs pass testing |
 | R6 | Team members unfamiliar with chosen stack | Medium | Medium | Use a stack most members already know (React, Node.js, MySQL); Adam sets up the project skeleton in Week 8 |
 
 ---
@@ -251,8 +253,9 @@ Priority uses MoSCoW: **M** = Must, **S** = Should, **C** = Could.
 | FR-30 | Users shall be able to view notifications and mark them as read. | M | M5 |
 | FR-31 | The system shall notify officers when a High priority report has had no action for 4 working hours. | S | M5 |
 | OPT-01 | The system could award reward points to reporters for reports that are resolved (not rejected or duplicate) and show a leaderboard. | C | M3/M5 |
-| OPT-02 | The system could show recycling points on an interactive campus map with colour-coded bin status. | C | M2 |
-| OPT-03 | The system could show weekly and monthly trend charts of waste collected by type. | C | M5 |
+| OPT-02 | The system could show recycling points on an interactive campus map with colour-coded bin status, and let users follow each point's collection status for the day (Scheduled, In Progress, Collected). | C | M2/M4 |
+| OPT-03 | The system could show weekly and monthly trend charts of waste collected by type, and flag points whose weekly weight rises more than 30% over their 4-week average. | C | M5 |
+| OPT-04 | The system could suggest a visiting order for a worker's tasks for the day, using the recycling points' coordinates and a nearest-neighbour ordering starting from the facilities office. | C | M4 |
 
 **Non-functional requirements**
 
@@ -316,7 +319,7 @@ flowchart LR
 
 > Note for the final PDF: redraw this in draw.io or StarUML with proper stick-figure actors and ovals. Mermaid has no native UML use case shapes. All use cases except UC-02 require the actor to be logged in (UC-01).
 
-#### Use Case 1: Log In
+#### 3.2.1 Use Case 1: Log In
 
 | Field | | Details |
 |---|---|---|
@@ -329,7 +332,7 @@ flowchart LR
 | Alternative flows and exceptions | | **A1 Wrong password:** at step 2 the system shows "Incorrect email or password" and increments the failed-attempt count. After 5 failures the account is locked for 15 minutes (FR-04).<br>**A2 Account inactive or unverified:** system shows a message and offers to resend the verification email.<br>**A3 Forgot password:** user clicks **Forgot password**, enters email, and the system sends a reset link (FR-05). |
 | Non-functional requirements | | NFR-01, NFR-02, NFR-03 |
 
-#### Use Case 2: Submit Waste Report
+#### 3.2.2 Use Case 2: Submit Waste Report
 
 | Field | | Details |
 |---|---|---|
@@ -342,7 +345,7 @@ flowchart LR
 | Alternative flows and exceptions | | **A1 Possible duplicate:** at step 5, if an open report for the same bin and category exists from the last 24 hours, the system shows it and asks "Submit anyway?" The user can cancel or continue (FR-18).<br>**E1 Invalid photo:** if the file is not JPG/PNG or is over 5 MB, the system rejects it and keeps the other fields filled in.<br>**E2 Missing fields:** system highlights the missing point or category and does not submit. |
 | Non-functional requirements | | NFR-04, NFR-07, NFR-08, NFR-09 |
 
-#### Use Case 3: Review and Resolve Reports
+#### 3.2.3 Use Case 3: Review and Resolve Reports
 
 | Field | | Details |
 |---|---|---|
@@ -355,7 +358,7 @@ flowchart LR
 | Alternative flows and exceptions | | **A1 Resolve directly:** at step 4 the officer marks the report Resolved with a note (for example the bin was already emptied).<br>**A2 Duplicate:** officer selects the original report; the system sets status Duplicate and links the two. The report is kept, not deleted (FR-17).<br>**A3 Reject:** officer rejects with a reason (for example not on campus). Reporter is notified.<br>**E1 Report already handled:** if another officer changed the report meanwhile, the system shows the latest status and asks the officer to reload. |
 | Non-functional requirements | | NFR-06, NFR-09 |
 
-#### Use Case 4: Assign Collection Tasks
+#### 3.2.4 Use Case 4: Assign Collection Tasks
 
 | Field | | Details |
 |---|---|---|
@@ -368,7 +371,7 @@ flowchart LR
 | Alternative flows and exceptions | | **A1 Reassign:** officer selects a task that is Assigned but not yet In Progress and picks another worker. The system notifies both workers.<br>**E1 Task already started:** system blocks reassignment of tasks In Progress or Completed.<br>**E2 Worker deactivated:** system hides inactive workers and flags their open tasks as unassigned. |
 | Non-functional requirements | | NFR-05, NFR-06, NFR-09 |
 
-#### Use Case 5: Update Task and Record Collection
+#### 3.2.5 Use Case 5: Update Task and Record Collection
 
 | Field | | Details |
 |---|---|---|
@@ -381,7 +384,7 @@ flowchart LR
 | Alternative flows and exceptions | | **A1 Bin damaged:** at step 3 the worker sets status Damaged and adds a note; the system creates a High priority report for the officer.<br>**A2 Missed:** worker cannot complete (for example area locked) and selects **Missed** with a reason. The task goes back to the officer's unassigned list for the next day.<br>**E1 Invalid weight:** weight less than 0 or above 500 kg is rejected.<br>**E2 Connection lost:** nothing is saved until step 5 succeeds; the form keeps the entered values for retry (NFR-10). |
 | Non-functional requirements | | NFR-05, NFR-08, NFR-09, NFR-10 |
 
-#### Other use cases (brief)
+#### 3.2.6 Other use cases (brief)
 
 | ID | Name | Actor | Summary |
 |---|---|---|---|
@@ -775,6 +778,10 @@ flowchart LR
 | FR-26, FR-27 | UC-14 | COLLECTION_RECORD, WASTE_REPORT, COLLECTION_TASK, STATUS_LOG | M5 / Dashboard |
 | FR-28 | UC-15 | COLLECTION_RECORD | M5 / Export |
 | FR-29, FR-30, FR-31 | UC-16, Send Notification | NOTIFICATION | M5 / Notifications, scheduler job |
+| OPT-01 | UC-08, UC-13 | USER (points), REWARD_TRANSACTION (to add) | M3 / My Reports, leaderboard |
+| OPT-02 | UC-11, UC-12, Recycling Points list | RECYCLING_POINT, BIN, COLLECTION_TASK | M2 + M4 / Campus Map |
+| OPT-03 | UC-14 | COLLECTION_RECORD | M5 / Dashboard trend chart |
+| OPT-04 | UC-11 | COLLECTION_TASK, RECYCLING_POINT | M4 / Today's Tasks (suggested order) |
 | NFR-01 to NFR-04 | UC-01, UC-07 | USER, WASTE_REPORT | M1 middleware, data access layer |
 | NFR-09, NFR-10 | UC-12, UC-13 | STATUS_LOG, COLLECTION_RECORD | Data access layer |
 
@@ -785,7 +792,7 @@ flowchart LR
 
 **Open issues**
 1. Confirm with the tutor whether the Administrator should also be able to do all officer tasks or only manage accounts.
-2. Decide whether reward points (OPT-01) are worth the time, since it needs an extra REWARD_TRANSACTION table.
+2. Reward points (OPT-01) need an extra REWARD_TRANSACTION table; Member 3 to add it to the ERD if the group confirms OPT-01.
 3. Agree on how to host the prototype for the demo (local machine or a free cloud host).
 
 **Implementation priorities for Part II**
@@ -793,7 +800,7 @@ flowchart LR
 2. M2 points and bins (Week 8–9), needed before reports and schedules can be tested.
 3. M3 reports and M4 schedules/tasks in parallel (Week 9–10).
 4. M5 dashboard and notifications (Week 10–11).
-5. Optional features only after all Must requirements pass testing.
+5. Level 5 features (OPT-01 to OPT-04), each by its owner, once their Must requirements pass testing.
 
 ---
 
