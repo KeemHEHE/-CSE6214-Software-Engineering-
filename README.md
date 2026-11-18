@@ -5,6 +5,7 @@ MMU, November 2026 (Term 2630). Part I & II group project.
 ## Docs
 - [Project Description & Rubrics](docs/PROJECT_DESCRIPTION.md)
 - [Part I Group Report Template](docs/PART_I_REPORT_TEMPLATE.md)
+- [Part I Report (draft)](docs/PART_I_REPORT.md)
 
 ## Key Dates
 | Milestone | Due |
