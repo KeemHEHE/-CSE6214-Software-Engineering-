@@ -3,7 +3,7 @@
 
 - **Tutorial Group:** TT6L / G[xx]
 - **Submission week:** Week 7
-- **Version:** 0.1 (draft) / 18/11/2026
+- **Version:** 0.2 (draft) / 18/11/2026
 
 | Student name | Student ID | Assigned actor, use cases, diagrams and responsibilities |
 |---|---|---|
@@ -44,6 +44,7 @@
 | Version | Date | Author(s) | Description of Version |
 |---|---|---|---|
 | 0.1 | 18/11/2026 | Adam | First full draft of all sections for group review. Members 2 to 4 still placeholders. |
+| 0.2 | 18/11/2026 | Adam | ERD fixes: optional worker on task, point may have no bins, SCHEDULE_DAY table for 1NF, STATUS_LOG real FKs, task waste type, lockout and token columns, enum values filled in. |
 
 ---
 
@@ -401,16 +402,19 @@ flowchart LR
 ```mermaid
 erDiagram
     USER ||--o{ WASTE_REPORT : "submits"
-    USER ||--o{ COLLECTION_TASK : "is assigned"
+    USER |o--o{ COLLECTION_TASK : "is assigned"
     USER ||--o{ COLLECTION_SCHEDULE : "creates"
     USER ||--o{ NOTIFICATION : "receives"
     USER ||--o{ STATUS_LOG : "makes change"
-    RECYCLING_POINT ||--|{ BIN : "contains"
+    WASTE_REPORT |o--o{ STATUS_LOG : "has history"
+    COLLECTION_TASK |o--o{ STATUS_LOG : "has history"
+    RECYCLING_POINT ||--o{ BIN : "contains"
     RECYCLING_POINT ||--o{ WASTE_REPORT : "is location of"
     RECYCLING_POINT ||--o{ COLLECTION_SCHEDULE : "has"
     RECYCLING_POINT ||--o{ COLLECTION_TASK : "is collected in"
     BIN |o--o{ WASTE_REPORT : "is subject of"
     BIN ||--o{ COLLECTION_RECORD : "has"
+    COLLECTION_SCHEDULE ||--|{ SCHEDULE_DAY : "runs on"
     COLLECTION_SCHEDULE |o--o{ COLLECTION_TASK : "generates"
     WASTE_REPORT |o--o| COLLECTION_TASK : "creates"
     WASTE_REPORT |o--o{ WASTE_REPORT : "duplicate of"
@@ -425,6 +429,10 @@ erDiagram
         enum role "STUDENT_STAFF, WORKER, OFFICER, ADMIN"
         enum status "PENDING, ACTIVE, LOCKED, INACTIVE"
         int failed_logins
+        datetime locked_until "nullable"
+        varchar verify_token_hash "nullable"
+        varchar reset_token_hash "nullable"
+        datetime reset_expires_at "nullable"
         boolean email_notify
         datetime created_at
     }
@@ -453,11 +461,11 @@ erDiagram
         int point_id FK
         int bin_id FK "nullable"
         int duplicate_of_id FK "nullable"
-        enum category
+        enum category "FULL_BIN, OVERFLOW, DAMAGED_BIN, CONTAMINATION, ILLEGAL_DUMPING, OTHER"
         varchar description
-        varchar photo_path
+        varchar photo_path "nullable"
         enum priority "LOW, MEDIUM, HIGH"
-        enum status
+        enum status "SUBMITTED, UNDER_REVIEW, ASSIGNED, RESOLVED, REJECTED, DUPLICATE"
         datetime created_at
         datetime resolved_at
     }
@@ -466,9 +474,12 @@ erDiagram
         int point_id FK
         int created_by FK
         enum waste_type
-        varchar days_of_week
         time time_slot
         boolean is_active
+    }
+    SCHEDULE_DAY {
+        int schedule_id PK, FK
+        enum day_of_week PK "MON, TUE, WED, THU, FRI, SAT"
     }
     COLLECTION_TASK {
         int task_id PK
@@ -476,8 +487,9 @@ erDiagram
         int schedule_id FK "nullable"
         int report_id FK "nullable, unique"
         int worker_id FK "nullable"
+        enum waste_type "nullable = all bins at point"
         date scheduled_date
-        enum priority
+        enum priority "LOW, MEDIUM, HIGH"
         enum status "UNASSIGNED, ASSIGNED, IN_PROGRESS, COMPLETED, MISSED"
         datetime started_at
         datetime completed_at
@@ -485,7 +497,7 @@ erDiagram
     }
     COLLECTION_RECORD {
         int record_id PK
-        int task_id FK
+        int task_id FK "UK with bin_id"
         int bin_id FK
         decimal weight_kg
         enum fill_status_after
@@ -502,8 +514,8 @@ erDiagram
     }
     STATUS_LOG {
         int log_id PK
-        enum entity_type "REPORT, TASK"
-        int entity_id
+        int report_id FK "nullable"
+        int task_id FK "nullable"
         varchar old_status
         varchar new_status
         int changed_by FK
@@ -517,19 +529,21 @@ erDiagram
 
 | Entity | Description |
 |---|---|
-| USER | Every person who uses the system. A single table with a `role` column is used instead of separate tables per actor, because all roles share the same login fields and the role-specific data is small. Email is unique. |
+| USER | Every person who uses the system. A single table with a `role` column is used instead of separate tables per actor, because all roles share the same login fields and the role-specific data is small. Email is unique. `locked_until` supports the login lockout (FR-04); the token hash columns support email verification (FR-02) and password reset (FR-05). |
 | RECYCLING_POINT | A physical location on campus where one or more bins are placed. Points are deactivated, not deleted, so that old reports and records stay valid. |
-| BIN | A single container at a point for one waste type. Each point has one or more bins (1:M, mandatory). `fill_status` is the latest known status. `qr_code` is unique and used by FR-11. |
+| BIN | A single container at a point for one waste type. A point can have zero or more bins (1:M, optional), since a new point is saved before its bins are added. `fill_status` is the latest known status. `qr_code` is unique and used by FR-11. |
 | WASTE_REPORT | A problem raised by a student or staff member about a point, and optionally a specific bin. `duplicate_of_id` is a self-reference used when the report is closed as a duplicate. Reports are never deleted (FR-17). |
-| COLLECTION_SCHEDULE | A recurring plan to collect a waste type at a point on certain days. Created by an officer. `days_of_week` stores values like `MON,THU`. |
-| COLLECTION_TASK | A single job for one point on one date. It comes either from a schedule (`schedule_id`) or from a report (`report_id`), and at least one of these must be set. A report creates at most one task (1:0..1). `worker_id` is empty until assigned. |
-| COLLECTION_RECORD | The weight collected from one bin during one task. This is the main source for the performance reports in M5. One task produces many records, one per bin. |
+| COLLECTION_SCHEDULE | A recurring plan to collect a waste type at a point in a time slot. Created by an officer. |
+| SCHEDULE_DAY | The days a schedule runs, one row per day (for example two rows, MON and THU). Kept as a separate table so that `days_of_week` is not stored as a comma list, which would break first normal form and make the daily task query harder. |
+| COLLECTION_TASK | A single job for one point on one date. It comes either from a schedule (`schedule_id`) or from a report (`report_id`), and at least one of these must be set. A report creates at most one task (1:0..1). `worker_id` is empty until assigned, so a task has zero or one worker. `waste_type` limits which bins at the point the task covers; if empty, the task covers every active bin at the point. |
+| COLLECTION_RECORD | The weight collected from one bin during one task. This is the main source for the performance reports in M5. One task produces many records, at most one per bin (`task_id` + `bin_id` unique). |
 | NOTIFICATION | A message to one user about a status change or assignment, shown in-app and optionally emailed. |
-| STATUS_LOG | Audit trail of every status change on reports and tasks, with who made it and when (NFR-09). Used to compute average resolution time (FR-27). |
+| STATUS_LOG | Audit trail of every status change on reports and tasks, with who made it and when (NFR-09). Used to compute average resolution time (FR-27). It has two nullable foreign keys, `report_id` and `task_id`, with exactly one set, so the database can enforce that every log row points to a real record. |
 
 **Data assumptions and constraints**
 - All primary keys are auto-increment integers. Foreign keys use `ON DELETE RESTRICT`, because the design deactivates records instead of deleting them.
 - `CHECK (schedule_id IS NOT NULL OR report_id IS NOT NULL)` on COLLECTION_TASK.
+- `CHECK ((report_id IS NULL) <> (task_id IS NULL))` on STATUS_LOG, so exactly one is set.
 - `CHECK (weight_kg >= 0 AND weight_kg <= 500)` on COLLECTION_RECORD.
 - `bin_id` on WASTE_REPORT must belong to the same `point_id` (enforced in the application layer).
 - The tables are in third normal form. Report and task totals are calculated by query, not stored, so they cannot go out of sync.
