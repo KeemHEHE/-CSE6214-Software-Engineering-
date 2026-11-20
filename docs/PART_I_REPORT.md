@@ -107,7 +107,7 @@ Reasons for this choice:
 
 | WBS | Task | Owner | Week |
 |---|---|---|---|
-| 1.1 | Form group, agree on roles and tools (GitHub, Discord) | All | 1–2 |
+| 1.1 | Form group, agree on roles and tools (GitHub, WhatsApp) | All | 1–2 |
 | 1.2 | Background, problem statement, scope, development process | Adam | 2 |
 | 1.3 | Requirements elicitation (short survey of 10+ students, interview with facilities if possible) | Member 3 | 2–3 |
 | 1.4 | FR/NFR list and prioritisation | Each member for own modules; Adam merges | 3 |
