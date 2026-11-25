@@ -1,16 +1,16 @@
 # Software Planning, Requirement and Design
 ## for [System Title]
 
-- **Tutorial Group:** [TTxx] / [Gxx]
+- **Tutorial Group:** [TT6L] / [G03]
 - **Submission week:** Week 7
 - **Version:** [1.0] / [Date]
 
 | Student name | Student ID | Assigned actor, use cases, diagrams and responsibilities |
 |---|---|---|
 | Mohammad Adam Hakeem bin Mohd Adha Taufek | 252UC242PM | |
-| \<name\> | \<student #\> | |
-| \<name\> | \<student #\> | |
-| \<name\> | \<student #\> | |
+| Aidan Khaliq bin Shahnazaruddin | 252UC242NE | |
+| Wong Tian Yang | \<student #\> | |
+| Muhammad Hafiy Al-Hafiizh bin Johari | 252UC242QY | |
 
 ## Contents
 - [Revision History](#revision-history)
