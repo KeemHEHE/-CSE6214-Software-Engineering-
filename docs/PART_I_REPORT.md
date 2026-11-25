@@ -1,18 +1,18 @@
 # Software Planning, Requirement and Design
 ## for Campus Recycling and Waste Collection Management System (EcoBin MMU)
 
-- **Tutorial Group:** TT6L / G[xx]
+- **Tutorial Group:** TT6L / G03
 - **Submission week:** Week 7
-- **Version:** 0.5 (draft) / 18/11/2026
+- **Version:** 0.6 (draft) / 25/11/2026
 
 | Student name | Student ID | Assigned actor, use cases, diagrams and responsibilities |
 |---|---|---|
 | Mohammad Adam Hakeem bin Mohd Adha Taufek | 252UC242PM | **Role:** Project lead<br>**Actor:** Administrator<br>**Modules:** M1 User Management, M5 Notifications<br>**Use cases:** UC-01 to UC-04, UC-16<br>**Level 5:** OPT-02 Campus map and collection status tracking<br>**Diagrams:** System architecture<br>**Report sections:** 1.1 to 1.5, 5, 7<br>**Other:** Project setup, final PDF |
-| \<Member 2\> | \<student #\> | **Actor:** Sustainability Officer<br>**Modules:** M2 Recycling Point and Bin Management, M5 Dashboard and Export<br>**Use cases:** UC-05, UC-06, UC-14, UC-15<br>**Level 5:** OPT-03 Waste trend analysis<br>**Diagrams:** ERD<br>**Report sections:** 4<br>**Other:** Database script and seed data |
-| \<Member 3\> | \<student #\> | **Actor:** Student/Staff<br>**Modules:** M3 Waste Reporting and Collection Management<br>**Use cases:** UC-07, UC-08, UC-13<br>**Level 5:** OPT-01 Recycling rewards and points<br>**Diagrams:** Use case diagram<br>**Report sections:** 2, 3.2 diagram, 8<br>**Other:** Requirements survey |
-| \<Member 4\> | \<student #\> | **Actor:** Collection Worker<br>**Modules:** M4 Collection Scheduling and Assignment<br>**Use cases:** UC-09 to UC-12<br>**Level 5:** OPT-04 Collection route optimisation<br>**Diagrams:** Gantt chart, wireframes, navigation flow<br>**Report sections:** 1.6, 6<br>**Other:** Keep Gantt chart and risks updated weekly |
+| Aidan Khaliq bin Shahnazaruddin | 252UC242NE | **Actor:** Sustainability Officer<br>**Modules:** M2 Recycling Point and Bin Management, M5 Dashboard and Export<br>**Use cases:** UC-05, UC-06, UC-14, UC-15<br>**Level 5:** OPT-03 Waste trend analysis<br>**Diagrams:** ERD<br>**Report sections:** 4<br>**Other:** Database script and seed data |
+| Wong Tian Yang | \<student #\> | **Actor:** Student/Staff<br>**Modules:** M3 Waste Reporting and Collection Management<br>**Use cases:** UC-07, UC-08, UC-13<br>**Level 5:** OPT-01 Recycling rewards and points<br>**Diagrams:** Use case diagram<br>**Report sections:** 2, 3.2 diagram, 8<br>**Other:** Requirements survey |
+| Muhammad Hafiy Al-Hafiizh bin Johari | 252UC242QY | **Actor:** Collection Worker<br>**Modules:** M4 Collection Scheduling and Assignment<br>**Use cases:** UC-09 to UC-12<br>**Level 5:** OPT-04 Collection route optimisation<br>**Diagrams:** Gantt chart, wireframes, navigation flow<br>**Report sections:** 1.6, 6<br>**Other:** Keep Gantt chart and risks updated weekly |
 
-> Draft note: group members, group number and IDs are placeholders until the group is formed (deadline 20/11/2026). Each member also writes the FRs, NFRs and use case descriptions for their own modules (Section 3) and their own weekly AI tracker entry (Section 9). M5 is split in two: Adam owns notifications and Member 2 owns the dashboard and export, so that everyone has a similar amount of code to defend in Part II.
+> Note: group members and group number confirmed (TT6L / G03). Wong Tian Yang's student ID is still outstanding. Each member also writes the FRs, NFRs and use case descriptions for their own modules (Section 3) and their own weekly AI tracker entry (Section 9). M5 is split in two: Adam owns notifications and Aidan owns the dashboard and export, so that everyone has a similar amount of code to defend in Part II.
 
 ## Contents
 - [Revision History](#revision-history)
@@ -45,9 +45,10 @@
 |---|---|---|---|
 | 0.1 | 18/11/2026 | Adam | First full draft of all sections for group review. Members 2 to 4 still placeholders. |
 | 0.2 | 18/11/2026 | Adam | ERD fixes: optional worker on task, point may have no bins, SCHEDULE_DAY table for 1NF, STATUS_LOG real FKs, task waste type, lockout and token columns, enum values filled in. |
-| 0.3 | 18/11/2026 | Adam | Rebalanced work: M5 split (notifications to Adam, dashboard/export to Member 2); report sections assigned per member. |
+| 0.3 | 18/11/2026 | Adam | Rebalanced work: M5 split (notifications to Adam, dashboard/export to Aidan); report sections assigned per member. |
 | 0.4 | 18/11/2026 | Adam | Checked against the official template and project description. Added route optimisation (OPT-04) so all four Level 5 features from the brief are covered, one per member. Use case headings numbered 3.2.x as in the template. |
 | 0.5 | 18/11/2026 | Adam | Made the whole report consistent with the work split: Level 5 features added to task breakdown, Gantt chart, system overview, ERD (REWARD_TRANSACTION), architecture, navigation flow, screen list and traceability. |
+| 0.6 | 25/11/2026 | Adam | Replaced placeholder group members with real names and student IDs (TT6L / G03): Aidan Khaliq bin Shahnazaruddin, Wong Tian Yang, Muhammad Hafiy Al-Hafiizh bin Johari. Wong's student ID is still outstanding. |
 
 ---
 
@@ -80,10 +81,10 @@ Waste collection on campus is run on a fixed routine with no feedback from the p
 | M5 Recycling Performance Reporting and Notifications | Dashboard and reports on collected weight by waste type, point and period; report response times; in-app and email notifications for status changes and assignments |
 
 **Level 5 extensions (the four listed in the project brief; one per member, started after that member's core FRs pass testing)**
-- Recycling rewards and points-based recognition for resolved reports (OPT-01, Member 3)
+- Recycling rewards and points-based recognition for resolved reports (OPT-01, Wong)
 - Interactive recycling location map and collection status tracking (OPT-02, Adam)
-- Waste generation trend analysis by week and month (OPT-03, Member 2)
-- Collection route optimisation: suggested visiting order for a worker's tasks based on bin locations (OPT-04, Member 4)
+- Waste generation trend analysis by week and month (OPT-03, Aidan)
+- Collection route optimisation: suggested visiting order for a worker's tasks based on bin locations (OPT-04, Hafiy)
 
 **Excluded**
 - Real IoT fill-level sensors. Fill status is updated manually by workers and through reports.
@@ -109,20 +110,20 @@ Reasons for this choice:
 |---|---|---|---|
 | 1.1 | Form group, agree on roles and tools (GitHub, WhatsApp) | All | 1–2 |
 | 1.2 | Background, problem statement, scope, development process | Adam | 2 |
-| 1.3 | Requirements elicitation (short survey of 10+ students, interview with facilities if possible) | Member 3 | 2–3 |
+| 1.3 | Requirements elicitation (short survey of 10+ students, interview with facilities if possible) | Wong | 2–3 |
 | 1.4 | FR/NFR list and prioritisation | Each member for own modules; Adam merges | 3 |
-| 1.5 | Use case diagram and use case descriptions | Member 3 (diagram, Section 2), each member (own UCs) | 3–4 |
-| 1.6 | ERD and data dictionary | Member 2 | 4–5 |
+| 1.5 | Use case diagram and use case descriptions | Wong (diagram, Section 2), each member (own UCs) | 3–4 |
+| 1.6 | ERD and data dictionary | Aidan | 4–5 |
 | 1.7 | System architecture | Adam | 5 |
-| 1.8 | Wireframes and navigation flow | Member 4 | 5–6 |
+| 1.8 | Wireframes and navigation flow | Hafiy | 5–6 |
 | 1.9 | Traceability table and consistency check | Adam | 6 |
-| 1.9a | Gantt chart and risk register (kept updated weekly) | Member 4 | 2–7 |
-| 1.9b | References and citation check | Member 3 | 6 |
+| 1.9a | Gantt chart and risk register (kept updated weekly) | Hafiy | 2–7 |
+| 1.9b | References and citation check | Wong | 6 |
 | 1.10 | Final review, PDF export, submission | All | 7 |
 | 2.1 | Project setup, M1 authentication and role guard | Adam | 8 |
-| 2.1a | Database schema script (from ERD) and seed data | Member 2 | 8 |
-| 2.2 | Module implementation: M2 + M5 reporting (Member 2), M3 (Member 3), M4 (Member 4), M5 notifications (Adam) | Module owners | 8–11 |
-| 2.2a | Level 5 features: OPT-01 rewards (Member 3), OPT-02 map and status tracking (Adam), OPT-03 trend analysis (Member 2), OPT-04 route optimisation (Member 4) | Feature owners | 10–11 |
+| 2.1a | Database schema script (from ERD) and seed data | Aidan | 8 |
+| 2.2 | Module implementation: M2 + M5 reporting (Aidan), M3 (Wong), M4 (Hafiy), M5 notifications (Adam) | Module owners | 8–11 |
+| 2.2a | Level 5 features: OPT-01 rewards (Wong), OPT-02 map and status tracking (Adam), OPT-03 trend analysis (Aidan), OPT-04 route optimisation (Hafiy) | Feature owners | 10–11 |
 | 2.3 | Integration and testing | All | 11–12 |
 | 2.4 | Individual reports and oral defence prep | Each member | 12–13 |
 
@@ -627,15 +628,15 @@ flowchart TB
 | Subsystem | Owner | Provides | Uses |
 |---|---|---|---|
 | M1 User Management | Adam | Login, token issue and check, role guard used by all other modules | Email service |
-| M2 Recycling Point and Bin Management | Member 2 | Point and bin data, QR codes, bin status updates | M1 (auth) |
-| M3 Waste Reporting | Member 3 | Report create/review/close; "create task from report" call to M4 | M1, M2 (point/bin lookup), M4, M5 notifications |
-| M4 Collection Scheduling and Assignment | Member 4 | Schedules, task generation, assignment, collection records; "resolve report" call to M3 | M1, M2 (bin list, fill status), M3, M5 notifications |
-| M5 Reporting (dashboard and export) | Member 2 | Dashboard queries, PDF/CSV export | Reads data from M2 to M4 |
+| M2 Recycling Point and Bin Management | Aidan | Point and bin data, QR codes, bin status updates | M1 (auth) |
+| M3 Waste Reporting | Wong | Report create/review/close; "create task from report" call to M4 | M1, M2 (point/bin lookup), M4, M5 notifications |
+| M4 Collection Scheduling and Assignment | Hafiy | Schedules, task generation, assignment, collection records; "resolve report" call to M3 | M1, M2 (bin list, fill status), M3, M5 notifications |
+| M5 Reporting (dashboard and export) | Aidan | Dashboard queries, PDF/CSV export | Reads data from M2 to M4 |
 | M5 Notifications | Adam | Notification creation, in-app list, email sending, 4-hour escalation job | Events from M3 and M4; email service |
-| Level 5: OPT-01 Rewards | Member 3 | Award points when a report is resolved, leaderboard | M3 events |
+| Level 5: OPT-01 Rewards | Wong | Award points when a report is resolved, leaderboard | M3 events |
 | Level 5: OPT-02 Campus Map and Status Tracking | Adam | Map page with points, bin fill status and today's collection status | Reads M2 (points, bins) and M4 (tasks) |
-| Level 5: OPT-03 Trend Analysis | Member 2 | Weekly/monthly trend charts, spike flags | Reads collection records (M4) |
-| Level 5: OPT-04 Route Optimisation | Member 4 | Suggested visiting order for a worker's daily tasks | Point coordinates (M2), tasks (M4) |
+| Level 5: OPT-03 Trend Analysis | Aidan | Weekly/monthly trend charts, spike flags | Reads collection records (M4) |
+| Level 5: OPT-04 Route Optimisation | Hafiy | Suggested visiting order for a worker's daily tasks | Point coordinates (M2), tasks (M4) |
 
 **Design rationale**
 - **Three tiers** keep the UI separate from business rules and data, so each member can work on their module's API and pages without touching other modules' code.
@@ -770,15 +771,15 @@ flowchart LR
 |---|---|---|
 | Login, Register, Forgot Password, Profile | UC-01, UC-02, UC-03 | Adam |
 | User Management | UC-04 | Adam |
-| Points and Bins, Recycling Points list | UC-05, UC-06 | Member 2 |
-| Report a Problem, My Reports, Report Detail, Reports Queue, Report Review | UC-07, UC-08, UC-13 | Member 3 |
-| Schedules, Task Assignment, Today's Tasks, Task Detail | UC-09 to UC-12 | Member 4 |
-| Dashboard, Export | UC-14, UC-15 | Member 2 |
+| Points and Bins, Recycling Points list | UC-05, UC-06 | Aidan |
+| Report a Problem, My Reports, Report Detail, Reports Queue, Report Review | UC-07, UC-08, UC-13 | Wong |
+| Schedules, Task Assignment, Today's Tasks, Task Detail | UC-09 to UC-12 | Hafiy |
+| Dashboard, Export | UC-14, UC-15 | Aidan |
 | Notifications | UC-16 | Adam |
 | Campus Map (OPT-02) | Recycling Points list, UC-11 | Adam |
-| Trend charts on Dashboard (OPT-03) | UC-14 | Member 2 |
-| Leaderboard, points on My Reports (OPT-01) | UC-08 | Member 3 |
-| Suggested order on Today's Tasks (OPT-04) | UC-11 | Member 4 |
+| Trend charts on Dashboard (OPT-03) | UC-14 | Aidan |
+| Leaderboard, points on My Reports (OPT-01) | UC-08 | Wong |
+| Suggested order on Today's Tasks (OPT-04) | UC-11 | Hafiy |
 
 > Note for the final PDF: these text wireframes are placeholders. Redraw them in Figma or draw.io and keep the annotations.
 
@@ -853,7 +854,7 @@ uml-diagrams.org (n.d.) *UML Use Case Diagrams*. Available at: https://www.uml-d
 
 | Tutorial & Group Name | Date |
 |---|---|
-| TT6L / G[xx] | 18/11/2026 |
+| TT6L / G03 | 18/11/2026 |
 
 **1. What was the task, and why did you decide to use AI to help?**
 > Produce a first full draft of the Part I report for the TT6L project so the group has a starting structure to review and divide up.
